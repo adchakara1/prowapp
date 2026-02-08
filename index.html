@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 6-7 Exam Prep</title>
+    
+    <!-- MathJax for rendering math (Fractions, Indices) -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #4A90E2;       /* Soft Blue */
+            --primary-dark: #357ABD;
+            --secondary: #F5F7FA;     /* Light Background */
+            --accent: #FFD166;        /* Soft Yellow for highlights */
+            --text: #2C3E50;
+            --success: #2ECC71;
+            --danger: #E74C3C;
+            --card-bg: #FFFFFF;
+            --radius: 16px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; }
+        h2 { color: var(--primary); margin-top: 0; }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn:hover { background-color: var(--primary-dark); }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-option {
+            background-color: #f0f4f8;
+            color: var(--text);
+            text-align: left;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+        }
+
+        .btn-option:hover { background-color: #e1e8ef; }
+
+        /* Quiz Specifics */
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: left;
+            border-left: 4px solid var(--primary);
+        }
+
+        .missed-q {
+            border-left-color: var(--danger);
+            font-size: 0.9rem;
+        }
+
+        /* Utility */
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 20px; }
+
+    </style>
+    <script src="questions.js" defer></script>
+</head>
+<body>
+
+    <header>
+        <h1>Exam Prep: Grade 6-7</h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- HOME VIEW -->
+        <div id="home-view" class="card">
+            <h2>Welcome!</h2>
+            <p>Ready to practice Math and Science?</p>
+            <button class="btn" onclick="app.startQuiz()">Start Practice Quiz</button>
+            <button class="btn btn-secondary" onclick="app.showDashboard()">Parent Dashboard</button>
+        </div>
+
+        <!-- QUIZ VIEW -->
+        <div id="quiz-view" class="card hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div id="question-container">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+
+        <!-- RESULTS VIEW -->
+        <div id="results-view" class="card hidden">
+            <h2>Session Complete!</h2>
+            <p>You scored:</p>
+            <h1 id="session-score" style="font-size: 3rem; color: var(--primary);">0/0</h1>
+            
+            <div id="results-analysis" class="mt-2">
+                <!-- Weakest topics from this session will be injected here -->
+            </div>
+
+            <button class="btn mt-2" onclick="app.showDashboard()">View Full Dashboard</button>
+            <button class="btn btn-secondary" onclick="app.goHome()">Back to Home</button>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="hidden">
+            <div class="card">
+                <h2>Parent Dashboard</h2>
+                <div class="stat-box">
+                    <strong>Overall Accuracy:</strong>
+                    <span id="overall-score">0%</span>
+                </div>
+                <div id="dashboard-analysis-container" class="mt-2">
+                    <!-- Analysis will be injected here -->
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="app.goHome()">Back to Home</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- APP LOGIC ---
+        const app = {
+            currentQuestionIndex: 0,
+            score: 0,
+            sessionHistory: [], // Stores { questionId, correct, topic, question, answer }
+            sessionQuestions: [], // Questions for the current session
+
+            init: function() {
+                // Check if LocalStorage exists, if not init
+                if (!localStorage.getItem('examPrepResults')) {
+                    localStorage.setItem('examPrepResults', JSON.stringify([]));
+                }
+            },
+
+            startQuiz: function() {
+                this.sessionQuestions = this.getQuestionsForSession();
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.sessionHistory = [];
+                this.showView('quiz-view');
+                this.renderQuestion();
+            },
+
+            getQuestionsForSession: function(count = 10) {
+                const allResults = JSON.parse(localStorage.getItem('examPrepResults')) || [];
+                const allQuestions = [...quizData];
+
+                // 1. Calculate topic accuracy
+                const topicStats = {};
+                allResults.forEach(r => {
+                    if (!topicStats[r.topic]) {
+                        topicStats[r.topic] = { total: 0, correct: 0, accuracy: 0 };
+                    }
+                    topicStats[r.topic].total++;
+                    if (r.isCorrect) topicStats[r.topic].correct++;
+                });
+
+                for (const topic in topicStats) {
+                    const stats = topicStats[topic];
+                    stats.accuracy = (stats.correct / stats.total) * 100;
+                }
+
+                // 2. Identify weak topics (accuracy < 60%)
+                const weakTopics = Object.keys(topicStats).filter(topic => topicStats[topic].accuracy < 60);
+
+                let selectedQuestions = [];
+                const seenQuestionIds = new Set(allResults.map(r => r.questionId));
+
+                // 3. Prioritize questions from weak topics
+                if (weakTopics.length > 0) {
+                    const weakTopicQuestions = allQuestions.filter(q => 
+                        weakTopics.includes(q.topic) && 
+                        !seenQuestionIds.has(q.id) &&
+                        q.difficulty < 3 // Start with easier questions in weak areas
+                    );
+                    selectedQuestions.push(...weakTopicQuestions.slice(0, Math.floor(count / 2)));
+                }
+
+                // 4. Fill remaining slots with a mix of other questions
+                const remainingSlots = count - selectedQuestions.length;
+                const otherQuestions = allQuestions.filter(q => !selectedQuestions.find(sq => sq.id === q.id));
+                
+                // Prefer unseen questions
+                const unseenOtherQuestions = otherQuestions.filter(q => !seenQuestionIds.has(q.id));
+                selectedQuestions.push(...unseenOtherQuestions.slice(0, remainingSlots));
+                
+                // If not enough, fill with seen questions we haven't already selected
+                if (selectedQuestions.length < count) {
+                    const seenOtherQuestions = otherQuestions.filter(q => seenQuestionIds.has(q.id) && !selectedQuestions.find(sq => sq.id === q.id));
+                    selectedQuestions.push(...seenOtherQuestions.slice(0, count - selectedQuestions.length));
+                }
+
+                // 5. If still not enough questions (e.g., small question pool), just shuffle and take `count`
+                if (selectedQuestions.length < count) {
+                    const shuffled = allQuestions.sort(() => 0.5 - Math.random());
+                    selectedQuestions = shuffled.slice(0, count);
+                }
+
+
+                return selectedQuestions.slice(0, count);
+            },
+
+            renderQuestion: function() {
+                const q = this.sessionQuestions[this.currentQuestionIndex];
+                const container = document.getElementById('question-container');
+                const progress = ((this.currentQuestionIndex) / this.sessionQuestions.length) * 100;
+                document.getElementById('progress-fill').style.width = `${progress}%`;
+
+                let html = `
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 0.9rem; color: #777; text-transform: uppercase; letter-spacing: 1px;">${q.subject} - ${q.topic}</span>
+                        ${q.image ? `<img src="${q.image}" class="question-image" alt="Question Diagram">` : ''}
+                        <h3 style="font-size: 1.4rem; margin: 10px 0 20px 0;">${q.question}</h3>
+                    </div>
+                    <div class="options-grid">
+                `;
+
+                q.options.forEach(opt => {
+                    // Escape single quotes for the onclick handler
+                    const safeOpt = opt.replace(/'/g, "\\'");
+                    html += `<button class="btn btn-option" onclick="app.handleAnswer('${safeOpt}')">${opt}</button>`;
+                });
+
+                html += `</div>`;
+                container.innerHTML = html;
+
+                // Trigger MathJax to render the new content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([container]);
+                }
+            },
+
+            handleAnswer: function(selectedOption) {
+                const q = this.sessionQuestions[this.currentQuestionIndex];
+                const isCorrect = selectedOption === q.answer;
+                
+                if (isCorrect) this.score++;
+
+                this.sessionHistory.push({
+                    questionId: q.id,
+                    topic: q.topic,
+                    question: q.question,
+                    correctAnswer: q.answer,
+                    isCorrect: isCorrect,
+                    date: new Date().toISOString()
+                });
+
+                this.currentQuestionIndex++;
+                if (this.currentQuestionIndex < this.sessionQuestions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.finishQuiz();
+                }
+            },
+
+            finishQuiz: function() {
+                // Save to LocalStorage
+                const allResults = JSON.parse(localStorage.getItem('examPrepResults'));
+                allResults.push(...this.sessionHistory);
+                localStorage.setItem('examPrepResults', JSON.stringify(allResults));
+
+                // Show Results
+                document.getElementById('session-score').innerText = `${this.score} / ${this.sessionQuestions.length}`;
+                
+                // --- NEW: Show session analysis ---
+                this.renderAnalysis(this.sessionHistory, 'results-analysis', false);
+
+                this.showView('results-view');
+            },
+
+            renderAnalysis: function(results, containerId, isAllHistory = false) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                // 1. Weakest Topics
+                const topicStats = {};
+                results.forEach(r => {
+                    if (!topicStats[r.topic]) topicStats[r.topic] = { total: 0, correct: 0 };
+                    topicStats[r.topic].total++;
+                    if (r.isCorrect) topicStats[r.topic].correct++;
+                });
+
+                const sortedTopics = Object.keys(topicStats).map(topic => {
+                    const stats = topicStats[topic];
+                    return {
+                        topic,
+                        accuracy: (stats.correct / stats.total) * 100,
+                        isWeak: (stats.correct / stats.total) < 0.6 
+                    };
+                }).filter(t => t.isWeak).sort((a, b) => a.accuracy - b.accuracy);
+
+                const title = isAllHistory ? 'Overall Weakest Topics' : 'Areas to Focus On from This Session';
+                let analysisHtml = `<h3>${title}</h3>`;
+
+                if (sortedTopics.length > 0) {
+                    analysisHtml += sortedTopics.map(t => 
+                        `<div class="stat-box" style="border-left-color: var(--danger);">
+                            <strong>${t.topic}</strong>: ${Math.round(t.accuracy)}% Correct
+                         </div>`
+                    ).join('');
+                } else {
+                    analysisHtml += '<p>Great job! No significant weak areas found.</p>';
+                }
+
+                // 2. Missed Questions
+                const missed = results.filter(r => !r.isCorrect);
+                const missedTitle = isAllHistory ? 'Recently Missed Questions' : 'Review These Questions from This Session';
+                if (missed.length > 0) {
+                    analysisHtml += `<h3 class="mt-2">${missedTitle}</h3>`;
+                    // For dashboard, show only last 5 missed
+                    const missedToShow = isAllHistory ? missed.reverse().slice(0, 5) : missed;
+                    analysisHtml += missedToShow.map(m => 
+                        `<div class="stat-box missed-q">
+                            <div>${m.question}</div>
+                            <div style="color: var(--success); margin-top: 5px;">Correct Answer: ${m.correctAnswer}</div>
+                         </div>`
+                    ).join('');
+                }
+                
+                container.innerHTML = analysisHtml;
+                if (window.MathJax) {
+                    MathJax.typesetPromise([container]);
+                }
+            },
+
+            showDashboard: function() {
+                const allResults = JSON.parse(localStorage.getItem('examPrepResults')) || [];
+                
+                // 1. Overall Score
+                const total = allResults.length;
+                const correct = allResults.filter(r => r.isCorrect).length;
+                const percentage = total === 0 ? 0 : Math.round((correct / total) * 100);
+                document.getElementById('overall-score').innerText = `${percentage}% (${correct}/${total})`;
+
+                // 2. Render analysis for all historical data into the new container
+                this.renderAnalysis(allResults, 'dashboard-analysis-container', true);
+
+                this.showView('dashboard-view');
+            },
+
+            goHome: function() {
+                this.showView('home-view');
+            },
+
+            showView: function(viewId) {
+                ['home-view', 'quiz-view', 'results-view', 'dashboard-view'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(viewId).classList.remove('hidden');
+            }
+        };
+
+        // Initialize
+        app.init();
+    </script>
+</body>
+</html>
